@@ -1,0 +1,1 @@
+-- Test database schema for Field-simbol-template
