@@ -118,10 +118,51 @@ export default class FieldSimbolTemplate extends HTMLElement {
     }
 
     /**
+     * Атрибут "clearFormFocus".
+     *
+     * Как вести себя текстовому полю при появление или потери фокуса:
+     *      "y" - текстовое поле при потери фокуса очищается и показывается содержимое атрибута "placeholder",
+     *            даже если часть символов введена. Если введены все символы в соответствии с шаблоном,
+     *            то при потери фокуса набранный текст отображается;
+     *      "n" - поле не очищается.
+     */
+    set clearFormFocus( val ){
+        this.setAttribute( 'clearFormFocus', val );
+    }
+    get clearFormFocus() {
+        if ( this.getAttribute( 'clearFormFocus' ) ) {
+            return this.getAttribute( 'clearFormFocus' );
+        }
+        else return FieldSimbolTemplate.DEFAULT_CLEARFORMFOCUS;
+    }
+    static get DEFAULT_CLEARFORMFOCUS() {
+        return 'y';
+    }
+
+    /**
      * Определяем, за какими атрибутами необходимо наблюдать.
      */
     static get observedAttributes() {
         //return ['Имя атрибута'];
+    }
+
+    /**
+     * Атрибут "placeholder".
+     *
+     * Текст, который отобразится в текстовом поле при появление фокуса.
+     */
+    set placeholder( val ){
+        this.setAttribute( 'placeholder', val );
+    }
+    get placeholder() {
+        if ( this.getAttribute( 'placeholder' ) ) {
+            return this.getAttribute( 'placeholder' );
+        }
+        else return FieldSimbolTemplate.DEFAULT_PLACEHOLDER;
+    }
+    static get DEFAULT_PLACEHOLDER() {
+        return null;
+        //return 'Телефон';
     }
 
     /**
@@ -173,6 +214,41 @@ export default class FieldSimbolTemplate extends HTMLElement {
     }
 
     /**
+     * Показывает или скрывает курсор.
+     *
+     * @param {string} status Состояние текстового поля: фокус или потеря фокуса.
+     * @return void
+     */
+    cursorHideShow( status ) {
+        
+    }
+
+    /**
+     * Показывает или скрывает плейсхолдер.
+     *
+     * @param {string} status Состояние текстового поля: фокус или потеря фокуса.
+     * @return void
+     */
+    placeholderHideShow( status ) {
+        if ( this.placeholder === null ) {
+            this.root.innerHTML = Template.render();
+            this.substituteInTemplate( this.template, '' );
+            this.moveContent();
+        }
+        else {
+            if ( status == 'focus' ) {
+                this.root.innerHTML = Template.render();
+                this.substituteInTemplate( this.template, '' );
+                this.moveContent();
+            }
+            if ( status == 'lossfocus' ) {
+                this.root.innerHTML = Template.render();
+                this.root.append( this.placeholder );
+            }
+        }
+    }
+
+    /**
      * Следим за изменениями этих атрибутов и отвечаем соответственно.
      */
     attributeChangedCallback( name, oldVal, newVal ) {
@@ -191,18 +267,20 @@ export default class FieldSimbolTemplate extends HTMLElement {
      * (может вызываться много раз, если элемент многократно добавляется/удаляется).
      */
     connectedCallback() {
+        // При первой загрузки страницы плейсхолдер не имеет фокуса:
+        this.placeholderHideShow( 'lossfocus' );
+
         // СОБЫТИЯ:
         let keyboardHandler = (e) => this.keyboardHandler(e);
         this.addEventListener('click', (e) => {
             e.stopPropagation();
             document.addEventListener('keyup', keyboardHandler);
+            this.placeholderHideShow( 'focus' );
         });
         document.addEventListener('click', (e) => {
             document.removeEventListener('keyup', keyboardHandler);
+            this.placeholderHideShow( 'lossfocus' );
         });
-
-        this.substituteInTemplate( this.template, '' );
-        this.moveContent();
     }
 
     /**
