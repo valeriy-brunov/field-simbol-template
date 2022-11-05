@@ -46,6 +46,9 @@ export default {
             .cursor {
                 border-right: 1px solid black;
             }
+            :host(.hidecursor) .cell {
+                border-right: none;
+            }
         </style>`;
     },
 }

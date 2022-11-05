@@ -13,6 +13,13 @@
  */
 ?>
 
+<?php
+    // Служебные атрибуты:
+    $attr[0]['status'] = 'lossfocus';
+    $attr[0]['class']  = 'hidecursor';
+    $attr[0]['value']  = '';
+?>
+
 <?php $this->start('wc-field-simbol-template') ?>
     <?php // Содержимое веб-компонента. ?>
 <?php $this->end() ?>

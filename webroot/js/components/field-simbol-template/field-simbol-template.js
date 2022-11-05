@@ -31,10 +31,6 @@ export default class FieldSimbolTemplate extends HTMLElement {
         // Кэширование элементов компонента для теневой модели.
         this.domShadow = Template.mapDomShadow( this.root );
 
-        // Задаём начальные значения.
-        // Строка будет содержать текст набранный с клавиатуры пользователем:
-        this.sequence = '';
-
         // Кешируем значения.
         this.cashe = this.casheValue();
     }
@@ -67,13 +63,37 @@ export default class FieldSimbolTemplate extends HTMLElement {
         this.setAttribute( 'template', val );
     }
     get template() {
-        if ( this.getAttribute( 'template' ) ) {
+        if ( this.hasAttribute( 'template' ) ) {
             return this.getAttribute( 'template' );
         }
         else return FieldSimbolTemplate.DEFAULT_TEMPLATE;
     }
     static get DEFAULT_TEMPLATE() {
         return '+7(___)___-__-__';
+    }
+
+    /**
+     * Атрибут "value".
+     *
+     * Текст, набранный с клавиатуры без подстановки в шаблон. В дальнейшем полученная строка
+     * может быть отправлена на сервер.
+     * !!! Данный атрибут должен присутствовать в веб-компоненте как служебный, т.е. существовать
+     *     при первой загрузке веб-компонента.
+     *
+     * @param {string} val Строка.
+     * @return void
+     */
+    set value( val ) {
+        this.setAttribute( 'value', val );
+    }
+    get value() {
+        if ( this.hasAttribute('value') ) {
+            return this.getAttribute( 'value' );
+        }
+        else return FieldSimbolTemplate.DEFAULT_VALUE;
+    }
+    static get DEFAULT_VALUE() {
+        return '';
     }
 
     /**
@@ -88,7 +108,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
         this.setAttribute( 'input', val );
     }
     get input() {
-        if ( this.getAttribute( 'input' ) ) {
+        if ( this.hasAttribute( 'input' ) ) {
             return this.getAttribute( 'input' );
         }
         else return FieldSimbolTemplate.DEFAULT_INPUT;
@@ -108,7 +128,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
         this.setAttribute( 'displayInput', val );
     }
     get displayInput() {
-        if ( this.getAttribute( 'displayInput' ) ) {
+        if ( this.hasAttribute( 'displayInput' ) ) {
             return this.getAttribute( 'displayInput' );
         }
         else return FieldSimbolTemplate.DEFAULT_DISPLAYINPUT;
@@ -120,17 +140,21 @@ export default class FieldSimbolTemplate extends HTMLElement {
     /**
      * Атрибут "clearFormFocus".
      *
-     * Как вести себя текстовому полю при появление или потери фокуса:
-     *      "y" - текстовое поле при потери фокуса очищается и показывается содержимое атрибута "placeholder",
-     *            даже если часть символов введена. Если введены все символы в соответствии с шаблоном,
-     *            то при потери фокуса набранный текст отображается;
-     *      "n" - поле не очищается.
+     * Что делать с содержимым текстового поля при появление или потери фокуса:
+     *      "y" - текстовое поле "при потери фокуса" очищается и показывается содержимое атрибута "placeholder",
+     *            даже если часть символов введена. "При возникновение фокуса" текстовое поле очищается и
+     *            набор начинается заново;
+     *      "n" - текстовое поле не очищается "при потери фокуса". Если не набрано ни единого символа, показывается
+     *            "placeholder". Если введены часть символов, они остаются. "При появление фокуса" в текстовом
+     *            поле, набор продолжается с того места, где остановился набор символов.
+     * !!! Для всех режимов: если введены все символы в соответствии с шаблоном, то при "потери фокуса" или
+     *     "появление фокуса" набранный текст отображается;
      */
-    set clearFormFocus( val ){
+    set clearFormFocus( val ) {
         this.setAttribute( 'clearFormFocus', val );
     }
     get clearFormFocus() {
-        if ( this.getAttribute( 'clearFormFocus' ) ) {
+        if ( this.hasAttribute( 'clearFormFocus' ) ) {
             return this.getAttribute( 'clearFormFocus' );
         }
         else return FieldSimbolTemplate.DEFAULT_CLEARFORMFOCUS;
@@ -140,10 +164,28 @@ export default class FieldSimbolTemplate extends HTMLElement {
     }
 
     /**
+     * Атрибут "status".
+     *
+     * Сообщает, находится ли текстовое поле в фокусе:
+     *      "focus" - текстовое поле в фокусе;
+     *      "lossfocus" - текстовое поле потеряло фокус.
+     */
+    set status( val ) {
+        this.setAttribute( 'status', val );
+    }
+    get status() {
+        if ( this.hasAttribute( 'status' ) ) {
+            return this.getAttribute( 'status' );
+        }
+    }
+
+    /**
      * Определяем, за какими атрибутами необходимо наблюдать.
+     *
+     * @return array Массив атрибутов.
      */
     static get observedAttributes() {
-        //return ['Имя атрибута'];
+        return ['status'];
     }
 
     /**
@@ -151,25 +193,24 @@ export default class FieldSimbolTemplate extends HTMLElement {
      *
      * Текст, который отобразится в текстовом поле при появление фокуса.
      */
-    set placeholder( val ){
+    set placeholder( val ) {
         this.setAttribute( 'placeholder', val );
     }
     get placeholder() {
-        if ( this.getAttribute( 'placeholder' ) ) {
+        if ( this.hasAttribute( 'placeholder' ) ) {
             return this.getAttribute( 'placeholder' );
         }
         else return FieldSimbolTemplate.DEFAULT_PLACEHOLDER;
     }
     static get DEFAULT_PLACEHOLDER() {
         return null;
-        //return 'Телефон';
     }
 
     /**
      * Фильтрует значения символов.
      *
      * @param {simbol} key Символ.
-     * @return simbol
+     * @return simbol|empty
      */
     filterValue( key ) {
         if ( this.input == 'numbers' ) {
@@ -220,7 +261,20 @@ export default class FieldSimbolTemplate extends HTMLElement {
      * @return void
      */
     cursorHideShow( status ) {
-        
+        if ( status == 'focus' ) {
+            if ( this.hasAttribute('class') ) {
+                this.classList.remove('hidecursor');
+            }
+        }
+        if ( status == 'lossfocus' ) {
+            if ( this.hasAttribute('class') ) {
+                this.classList.add('hidecursor');
+            }
+            else {
+                this.setAttribute('class');
+                this.classList.add('hidecursor');
+            }
+        }
     }
 
     /**
@@ -231,15 +285,11 @@ export default class FieldSimbolTemplate extends HTMLElement {
      */
     placeholderHideShow( status ) {
         if ( this.placeholder === null ) {
-            this.root.innerHTML = Template.render();
-            this.substituteInTemplate( this.template, '' );
-            this.moveContent();
+            this.updateField( this.template, '' );
         }
         else {
             if ( status == 'focus' ) {
-                this.root.innerHTML = Template.render();
-                this.substituteInTemplate( this.template, '' );
-                this.moveContent();
+                this.updateField( this.template, '' );
             }
             if ( status == 'lossfocus' ) {
                 this.root.innerHTML = Template.render();
@@ -249,17 +299,98 @@ export default class FieldSimbolTemplate extends HTMLElement {
     }
 
     /**
+     * В зависимости от выбранного режима формы (геттер "clearFormFocus") управляет содержимым формы.
+     *
+     * @param {string} status Состояние текстового поля: фокус или потеря фокуса.
+     * @return void
+     */
+    formFocus( status ) {
+        if ( this.clearFormFocus == 'y' ) {
+            if ( status == 'lossfocus' ) {
+                if ( this.cashe.templateLengthSubstitute == this.value.length ) {
+                    this.updateField( this.template, this.value );
+                }
+                else {
+                    this.value = '';
+                    this.placeholderHideShow( 'lossfocus' );
+                }
+            }
+            if ( status == 'focus' ) {
+                this.updateField( this.template, this.value );
+            }
+        }
+        if ( this.clearFormFocus == 'n' ) {
+            if ( status == 'lossfocus' ) {
+                if ( this.value.length === 0 ) {
+                    this.placeholderHideShow( 'lossfocus' );
+                }
+                else this.updateField( this.template, this.value );
+            }
+            if ( status == 'focus' ) {
+                this.updateField( this.template, this.value );
+            }
+        }
+    }
+
+    /**
      * Следим за изменениями этих атрибутов и отвечаем соответственно.
+     *
+     * @param {string} name Имя атрибута, в котором произошли изменения.
+     * @param {string} oldVal Старое значение атрибута, т.е. до его изменения.
+     * @param {string} newVal Новое значение атрибута.
+     * @return void
+     *
+     * !!! При первой загрузке страницы, если атрибуты установлены в веб-компоненте, происходит
+     *     срабатывание данной функции, при этом "oldVal=null", а "newVal" будет равно значению,
+     *     установленному в веб-компоненте.
      */
     attributeChangedCallback( name, oldVal, newVal ) {
         switch( name ) {
-            case 'Имя атрибута':
-                // Выполняемый код.
+            case 'status':
+                this.placeholderHideShow( this.status );
+                this.cursorHideShow( this.status );
+                this.formFocus( this.status );
                 break;
-            case 'Имя атрибута':
-            // Выполняемый код.
-            break;
+            case 'value':
+                if ( oldVal === null && newVal === '' ) {
+                    this.updateField( this.template, '' );
+                }
+                else {
+                    if ( newVal === '' ) {
+                        this.updateField( this.template, '' );
+                        break;
+                    }
+                    if ( newVal !== '' ) {
+                        let simbol = this.filterValue( newVal[newVal.length - 1] );
+                        if ( simbol === '' ) {
+                            if ( oldVal === null ) this.value = '';
+                            else this.value = oldVal;
+                            break;
+                        }
+                        else {
+                            let val = this.filterMaxSimbol( newVal );
+                            this.updateField( this.template, val );
+                            this.value = val;
+                            break;
+                        }
+                    }
+                }
+                break;
+            // Другие атрибуты.
         }
+    }
+
+    /**
+     * Вставляет в шаблон "templ" строку "str" и вставляет полученную строку в текстовое поле.
+     *
+     * @param {string} tmpl Шаблон.
+     * @param {string} str Строка символов.
+     * @return void
+     */
+    updateField( template, str ) {
+        this.substituteInTemplate( template, str );
+        this.root.innerHTML = Template.render();
+        this.moveContent();
     }
 
     /**
@@ -267,19 +398,16 @@ export default class FieldSimbolTemplate extends HTMLElement {
      * (может вызываться много раз, если элемент многократно добавляется/удаляется).
      */
     connectedCallback() {
-        // При первой загрузки страницы плейсхолдер не имеет фокуса:
-        this.placeholderHideShow( 'lossfocus' );
-
         // СОБЫТИЯ:
         let keyboardHandler = (e) => this.keyboardHandler(e);
         this.addEventListener('click', (e) => {
             e.stopPropagation();
             document.addEventListener('keyup', keyboardHandler);
-            this.placeholderHideShow( 'focus' );
+            this.status = 'focus';
         });
         document.addEventListener('click', (e) => {
             document.removeEventListener('keyup', keyboardHandler);
-            this.placeholderHideShow( 'lossfocus' );
+            this.status = 'lossfocus';
         });
     }
 
@@ -290,18 +418,17 @@ export default class FieldSimbolTemplate extends HTMLElement {
      * @return void
      */
     keyboardHandler( event ) {
+        let oldVal = this.value;
         if ( event.key == 'Backspace' ) {
-            this.sequence = this.sequence.slice(0, this.sequence.length - 1);
+            if ( oldVal.length > 0 ) this.value = oldVal.slice(0, oldVal.length - 1);
         }
         else {
-            this.sequence+= this.filterValue( event.key );
-            this.sequence = this.filterMaxSimbol( this.sequence );
+            if ( oldVal === '' ) {
+                this.value = event.key;
+            }
+            else this.value = oldVal + event.key;
         }
-
-        this.substituteInTemplate( this.template, this.sequence );
-        this.root.innerHTML = '';
-        this.root.innerHTML = Template.render();
-        this.moveContent();
+        this.attributeChangedCallback('value', oldVal, this.value);
     }
 
     /**
