@@ -1,7 +1,8 @@
 {
-    "name": "your-name-here/field-simbol-template",
-    "description": "Field-simbol-template plugin for CakePHP",
+    "name": "valeriy-brunov/field-simbol-template",
+    "description": "Field-simbol-template плагин для CakePHP",
     "type": "cakephp-plugin",
+    "home": "https://github.com/valeriy-brunov/ field-simbol-template",
     "license": "MIT",
     "require": {
         "php": ">=7.2",
