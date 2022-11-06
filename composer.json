@@ -2,11 +2,12 @@
     "name": "valeriy-brunov/field-simbol-template",
     "description": "Field-simbol-template плагин для CakePHP",
     "type": "cakephp-plugin",
-    "home": "https://github.com/valeriy-brunov/ field-simbol-template",
+    "home": "https://github.com/valeriy-brunov/field-simbol-template",
     "license": "MIT",
     "require": {
         "php": ">=7.2",
-        "cakephp/cakephp": "4.4.*"
+        "cakephp/cakephp": "4.4.*",
+        "valeriy-brunov/web-component": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.5 || ^9.3"

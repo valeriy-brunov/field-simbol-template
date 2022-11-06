@@ -114,7 +114,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
         else return FieldSimbolTemplate.DEFAULT_INPUT;
     }
     static get DEFAULT_INPUT() {
-        return 'all';
+        return 'numbers';
     }
 
     /**
