@@ -11,7 +11,7 @@
 Рекомендуемый способ установки пакетов composer - это:
 
 ```
-composer require your-name-here/field-simbol-template
+composer require valeriy-brunov/field-simbol-template
 composer dumpautoload
 bin/cake plugin load Field-simbol-template
 ```
