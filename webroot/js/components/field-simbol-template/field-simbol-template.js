@@ -114,7 +114,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
         else return FieldSimbolTemplate.DEFAULT_INPUT;
     }
     static get DEFAULT_INPUT() {
-        return 'letters';
+        return 'all';
     }
 
     /**
@@ -191,7 +191,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
     /**
      * Атрибут "placeholder".
      *
-     * Текст, который отобразится в текстовом поле при появление фокуса.
+     * Текст, который отобразится в текстовом поле при потери фокуса.
      */
     set placeholder( val ) {
         this.setAttribute( 'placeholder', val );
