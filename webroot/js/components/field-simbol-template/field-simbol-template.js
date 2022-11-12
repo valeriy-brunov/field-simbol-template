@@ -51,7 +51,20 @@ export default class FieldSimbolTemplate extends HTMLElement {
     casheValue() {
         return {
             templateLengthSubstitute: (this.template.split('_').length - 1),
+            placeholder: this.createHtmlPlaceholder(),
         }
+    }
+
+    /**
+     * Оборачивает текст плейсхолдера в "<span class='cell-placeholder'></span>".
+     *
+     * @return object
+     */
+    createHtmlPlaceholder() {
+        let span = document.createElement('span');
+        span.className = 'cell-placeholder';
+        span.innerHTML = this.placeholder;
+        return span;
     }
 
     /**
@@ -293,7 +306,7 @@ export default class FieldSimbolTemplate extends HTMLElement {
             }
             if ( status == 'lossfocus' ) {
                 this.root.innerHTML = Template.render();
-                this.root.append( this.placeholder );
+                this.root.append( this.cashe.placeholder );
             }
         }
     }
@@ -399,15 +412,19 @@ export default class FieldSimbolTemplate extends HTMLElement {
      */
     connectedCallback() {
         // СОБЫТИЯ:
+        let clickForm = false;
         let keyboardHandler = (e) => this.keyboardHandler(e);
         this.addEventListener('click', (e) => {
-            e.stopPropagation();
             document.addEventListener('keyup', keyboardHandler);
             this.status = 'focus';
+            clickForm = true;
         });
         document.addEventListener('click', (e) => {
-            document.removeEventListener('keyup', keyboardHandler);
-            this.status = 'lossfocus';
+            if ( clickForm ) clickForm = false;
+            else {
+                document.removeEventListener('keyup', keyboardHandler);
+                this.status = 'lossfocus';
+            }
         });
     }
 
