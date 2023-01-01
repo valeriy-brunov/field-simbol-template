@@ -1,6 +1,6 @@
 {
     "name": "valeriy-brunov/field-simbol-template",
-    "description": "Field-simbol-template плагин для CakePHP",
+    "description": "Помогает пользователю вводить текст по шаблону в текстовом поле. По умолчанию установлен шаблон ввода номера сотового телефона.",
     "type": "cakephp-plugin",
     "home": "https://github.com/valeriy-brunov/field-simbol-template",
     "license": "MIT",
