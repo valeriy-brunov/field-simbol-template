@@ -24,14 +24,20 @@
 
 <?php
     $this->Html->script(($namePlugin ? $pathPluginJs : 'components/field-simbol-template/field-simbol-template'), [
-        'block' => 'script',
+        'block' => ($this->request->is('ajax') ? 'js-field-simbol-template' : 'script'),
         'type' => 'module',
     ]);
+?>
+
+<?php
+    if ( $this->request->is('ajax') ) {
+        $attr[0]['jsload'] = str_replace(['<script src="', '" type="module"></script>'], ['', ''], $this->fetch('js-field-simbol-template'));
+    }
 ?>
 
 <brunov-field-simbol-template<?= $this->Webcomp->addattr( $attr[0] ) ?>>
     <template class="field-simbol-template">
         <?= $attr[0]['content'] ?? '' ?>
-        <?= $this->Webcomp->filterScript( $this->fetch('wc-field-simbol-template'), $attr[0]['js'] ) ?>
+        <?= $this->Webcomp->filterScript( $this->fetch('wc-insert-paginator'), $attr[0]['js'] ) ?>
     </template>
 </brunov-field-simbol-template>
