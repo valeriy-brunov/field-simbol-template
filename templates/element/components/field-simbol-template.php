@@ -18,19 +18,17 @@
     $attr[0]['value']  = '';
 ?>
 
-<?php $this->start('wc-field-simbol-template') ?>
-    <?php // Содержимое веб-компонента. ?>
-<?php $this->end() ?>
+<?php $this->start('wc-field-simbol-template') ?><?php $this->end() ?>
 
 <?php
     $this->Html->script(($namePlugin ? $pathPluginJs : 'components/field-simbol-template/field-simbol-template'), [
-        'block' => ($this->request->is('ajax') ? 'js-field-simbol-template' : 'script'),
+        'block' => ( ($this->request->is('ajax') and $attr[0]['jsajax']) ? 'js-field-simbol-template' : 'script'),
         'type' => 'module',
     ]);
 ?>
 
 <?php
-    if ( $this->request->is('ajax') ) {
+    if ( $this->request->is('ajax') and $attr[0]['jsajax'] ) {
         $attr[0]['jsload'] = str_replace(['<script src="', '" type="module"></script>'], ['', ''], $this->fetch('js-field-simbol-template'));
     }
 ?>
